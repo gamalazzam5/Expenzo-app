@@ -1,3 +1,4 @@
+import 'package:expenzo_app/views/home_view.dart';
 import 'package:flutter/material.dart';
 
 import 'views/splash_screen.dart';
@@ -11,7 +12,7 @@ class ExpenzoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: SplashScreen(),
+      home: HomePage(),
    debugShowCheckedModeBanner: false,
 
     );

@@ -1,7 +1,7 @@
 import 'package:expenzo_app/helper/app_assets.dart';
 import 'package:expenzo_app/helper/colors.dart';
 import 'package:expenzo_app/models/onboarding_model.dart';
-import 'package:expenzo_app/views/home_page.dart';
+import 'package:expenzo_app/views/home_view.dart';
 import 'package:flutter/material.dart';
 
 import '../helper/text_style.dart';
@@ -16,7 +16,7 @@ class OnboardingScreens extends StatefulWidget {
 class _OnboardingScreensState extends State<OnboardingScreens> {
   late PageController _pageController;
   int currentIndex = 0;
-  List<OnboardingModel> onboardingPage =  [
+  List<OnboardingModel> onboardingPage = [
     OnboardingModel(
       image: AppAssets.onboardingImage1,
       title: "Take Control of Your Finances",
