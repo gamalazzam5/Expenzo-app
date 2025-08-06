@@ -1,5 +1,4 @@
 import 'package:expenzo_app/helper/colors.dart';
-import 'package:expenzo_app/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
 import '../helper/text_style.dart';
@@ -58,12 +57,13 @@ class AddNewNoteBottomSheet extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: kPrimaryColor,
                 minimumSize: Size(360, 55),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
-            const SizedBox(height: 16,),
-            Text('Cancel',style: TextStyles.cancelStyle,)
+            const SizedBox(height: 16),
+            const Text('Cancel', style: TextStyles.cancelStyle),
           ],
         ),
       ),

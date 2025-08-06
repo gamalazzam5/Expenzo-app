@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../widgets/add_new_node.dart';
+import '../widgets/expense_data_state.dart';
 import '../widgets/expense_empty_state .dart';
 
 class HomePage extends StatefulWidget {
@@ -61,7 +62,8 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 57),
               const ExpenseMonthFilter(),
               const SizedBox(height: 40),
-              const ExpenseEmptyState(),
+             // const ExpenseEmptyState(),
+              const ExpenseDataState(),
 
             ],
           ),
