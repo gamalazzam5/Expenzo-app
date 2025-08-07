@@ -1,6 +1,8 @@
+import 'package:expenzo_app/database/sqflite.dart';
 import 'package:expenzo_app/helper/app_assets.dart';
 import 'package:expenzo_app/helper/colors.dart';
 import 'package:expenzo_app/helper/text_style.dart';
+import 'package:expenzo_app/models/expense_model.dart';
 import 'package:expenzo_app/widgets/expense_month_filter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +19,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  SqlDb dataBase = SqlDb();
   final currentDay = DateFormat('EEEE').format(DateTime.now());
   final dayNumber = DateFormat('d').format(DateTime.now());
   final monthName = DateFormat('MMMM').format(DateTime.now());
@@ -24,32 +27,55 @@ class _HomePageState extends State<HomePage> {
   TextEditingController noteAmount = TextEditingController();
   TextEditingController noteCategory = TextEditingController();
   TextEditingController noteDate = TextEditingController();
+  late Future<List<ExpenseModel>> _expensesFuture;
 
+@override
+  void initState() {
+  _expensesFuture = fetchExpenses();
+    super.initState();
+  }
+  void _refreshExpenses() {
+    setState(() {
+      _expensesFuture = fetchExpenses();
+    });
+  }
+  Future<List<ExpenseModel>> fetchExpenses() async {
+    final List<Map<String, dynamic>> maps = await dataBase.read('expenses');
+
+    return maps.map((e) => ExpenseModel.fromMap(e)).toList();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
-
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
         backgroundColor: kPrimaryColor,
-        onPressed: (){
+        onPressed: () {
           showModalBottomSheet(
-              isScrollControlled: true,
-              context: context, builder: (context){
-            return ShowModalSheet(noteAmount: noteAmount,
-            noteTitle: noteTitle,
-            noteCategory: noteCategory,
-            noteDate: noteDate,);
-          });
-        },child: Icon(Icons.add,color: Colors.white,),),
+            isScrollControlled: true,
+            context: context,
+            builder: (context) {
+              return ShowModalSheet(
+                onAdd: () => _refreshExpenses(),
+                database: dataBase,
+                noteAmount: noteAmount,
+                noteTitle: noteTitle,
+                noteCategory: noteCategory,
+                noteDate: noteDate,
+              );
+            },
+          );
+          
+        },
+        child: Icon(Icons.add, color: Colors.white),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
-            children:  [
+            children: [
               ListTile(
                 title: Text('My expenses:', style: TextStyles.semiBoldStyle),
                 subtitle: Text(
@@ -69,9 +95,20 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 57),
               const ExpenseMonthFilter(),
               const SizedBox(height: 40),
-             const ExpenseEmptyState(),
-              // const ExpenseDataState(),
-
+              FutureBuilder(
+                future: _expensesFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    final List<ExpenseModel> expenses = snapshot.data!;
+                    return ExpenseDataState(expenses: expenses);
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else {
+                    return const ExpenseEmptyState();
+                  }
+                },
+              ),
             ],
           ),
         ),
@@ -79,4 +116,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-

@@ -12,7 +12,7 @@ Color getMonthColor({required int currentIndex, required int index}) {
   }
 }
 
-String? getIconPath(String? categoryName) {
+String getIconPath(String categoryName) {
   switch (categoryName) {
     case 'Coffee':
       return 'assets/images/icons/coffee_icon.png';
@@ -23,6 +23,6 @@ String? getIconPath(String? categoryName) {
     case 'Food':
       return 'assets/images/icons/burger_icon.png';
     default:
-      return null;
+      return 'assets/images/icons/coffee_icon.png';
   }
 }

@@ -1,8 +1,10 @@
+import 'package:expenzo_app/database/sqflite.dart';
 import 'package:expenzo_app/helper/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../helper/text_style.dart';
+import '../models/expense_model.dart';
 import 'custom_title_with_text_field.dart';
 import 'drop_down_menu.dart';
 
@@ -13,12 +15,16 @@ class ShowModalSheet extends StatefulWidget {
     required this.noteAmount,
     required this.noteCategory,
     required this.noteDate,
+    required this.database,
+    required this.onAdd,
   });
 
+  final SqlDb database;
   final TextEditingController noteTitle;
   final TextEditingController noteAmount;
   final TextEditingController noteCategory;
   final TextEditingController noteDate;
+  final VoidCallback onAdd;
 
   @override
   State<ShowModalSheet> createState() => _ShowModalSheetState();
@@ -108,9 +114,25 @@ class _ShowModalSheetState extends State<ShowModalSheet> {
                 ),
                 const SizedBox(height: 27),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      Navigator.pop(context);
+                     int response = await widget.database.insert(
+                        'expenses',
+                        ExpenseModel(
+                          title: widget.noteTitle.text,
+                          date: widget.noteDate.text,
+                          amount:
+                              double.tryParse(widget.noteAmount.text) ?? 0.0,
+                          category: widget.noteCategory.text,
+                        ).toMap(),
+                      );
+                      if(response >0){
+                      widget.onAdd();
+                      widget.noteTitle.clear();
+                      widget.noteAmount.clear();
+                      widget.noteCategory.clear();
+                      widget.noteDate.clear();
+                      Navigator.pop(context);}
                     }
                   },
                   child: Text("Add", style: TextStyles.buttonOnboardingStyle),
