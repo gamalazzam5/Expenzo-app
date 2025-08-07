@@ -5,8 +5,8 @@ import 'package:expenzo_app/widgets/expense_month_filter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../widgets/add_new_node.dart';
-import '../widgets/expense_data_state.dart';
+import '../widgets/show_modal_sheet.dart';
+import '../widgets/expense_data.dart';
 import '../widgets/expense_empty_state .dart';
 
 class HomePage extends StatefulWidget {
@@ -20,6 +20,10 @@ class _HomePageState extends State<HomePage> {
   final currentDay = DateFormat('EEEE').format(DateTime.now());
   final dayNumber = DateFormat('d').format(DateTime.now());
   final monthName = DateFormat('MMMM').format(DateTime.now());
+  TextEditingController noteTitle = TextEditingController();
+  TextEditingController noteAmount = TextEditingController();
+  TextEditingController noteCategory = TextEditingController();
+  TextEditingController noteDate = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +39,10 @@ class _HomePageState extends State<HomePage> {
           showModalBottomSheet(
               isScrollControlled: true,
               context: context, builder: (context){
-            return AddNewNoteBottomSheet();
+            return ShowModalSheet(noteAmount: noteAmount,
+            noteTitle: noteTitle,
+            noteCategory: noteCategory,
+            noteDate: noteDate,);
           });
         },child: Icon(Icons.add,color: Colors.white,),),
       body: SafeArea(
@@ -57,13 +64,13 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 57),
               const Center(
-                child: Text("\$392.09", style: TextStyles.totalAmountStyle),
+                child: Text("\$0.00", style: TextStyles.totalAmountStyle),
               ),
               const SizedBox(height: 57),
               const ExpenseMonthFilter(),
               const SizedBox(height: 40),
-             // const ExpenseEmptyState(),
-              const ExpenseDataState(),
+             const ExpenseEmptyState(),
+              // const ExpenseDataState(),
 
             ],
           ),

@@ -1,16 +1,33 @@
 import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
-  const CustomTextField({super.key, required this.hint, this.maxLines = 1, this.suffixIcon});
+  const CustomTextField({
+    super.key,
+    required this.hint,
+    this.maxLines = 1,
+    this.suffixIcon,
+    required this.controller,
+    this.readOnly = false,
+  });
 
   final String hint;
   final int maxLines;
   final Widget? suffixIcon;
+  final TextEditingController controller;
+  final bool readOnly;
+
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
+      readOnly: readOnly,
+      controller: controller,
       maxLines: maxLines,
-
+      validator: (data) {
+        if (data == null || data.isEmpty) {
+          return 'this field is required';
+        }
+        return null;
+      },
       decoration: InputDecoration(
         suffixIcon: suffixIcon,
         hintText: hint,
