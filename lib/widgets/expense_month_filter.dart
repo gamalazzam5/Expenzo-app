@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../helper/methods.dart';
 
 class ExpenseMonthFilter extends StatefulWidget {
-  const ExpenseMonthFilter({super.key});
+  const ExpenseMonthFilter({super.key, required this.onMonthSelected});
+
+  final Function(int) onMonthSelected;
 
   @override
   State<ExpenseMonthFilter> createState() => _ExpenseMonthFilter();
@@ -47,8 +49,8 @@ class _ExpenseMonthFilter extends State<ExpenseMonthFilter> {
 
   @override
   void dispose() {
-    super.dispose();
     _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -64,6 +66,7 @@ class _ExpenseMonthFilter extends State<ExpenseMonthFilter> {
             onTap: () {
               setState(() {
                 currentIndex = index;
+                widget.onMonthSelected(index);
               });
             },
             child: Container(

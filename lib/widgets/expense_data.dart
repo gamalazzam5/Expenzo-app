@@ -7,12 +7,10 @@ import '../helper/methods.dart';
 import '../helper/text_style.dart';
 
 class ExpenseDataState extends StatefulWidget {
-  const ExpenseDataState({
-    super.key,
-    required this.expenses,
-  });
+  const ExpenseDataState({super.key, required this.expenses, required this.onExpenseDeleted});
 
   final List<ExpenseModel> expenses;
+  final VoidCallback onExpenseDeleted;
 
   @override
   State<ExpenseDataState> createState() => _ExpenseDataStateState();
@@ -31,9 +29,13 @@ class _ExpenseDataStateState extends State<ExpenseDataState> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('The expense was deleted'),backgroundColor: kPrimaryColor,),
+          SnackBar(
+            content: Text('The expense was deleted'),
+            backgroundColor: kPrimaryColor,
+          ),
         );
       }
+      widget.onExpenseDeleted();
     }
   }
 

@@ -7,9 +7,10 @@ import 'package:expenzo_app/widgets/expense_month_filter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../widgets/expense_empty_state .dart';
 import '../widgets/show_modal_sheet.dart';
 import '../widgets/expense_data.dart';
-import '../widgets/expense_empty_state .dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,22 +29,51 @@ class _HomePageState extends State<HomePage> {
   TextEditingController noteCategory = TextEditingController();
   TextEditingController noteDate = TextEditingController();
   late Future<List<ExpenseModel>> _expensesFuture;
+  int selectedMonth = DateTime.now().month;
+  int selectedYear = DateTime.now().year;
+  double totalAmount = 0.0;
 
-@override
+  @override
   void initState() {
-  _expensesFuture = fetchExpenses();
+    _refreshExpenses();
     super.initState();
   }
+
   void _refreshExpenses() {
     setState(() {
-      _expensesFuture = fetchExpenses();
+      _expensesFuture = fetchExpenses().then((list) {
+        setState(() {
+          totalAmount = list.fold(0.0, (sum, expense) => sum + expense.amount);
+        });
+        return list;
+      });
     });
   }
+
   Future<List<ExpenseModel>> fetchExpenses() async {
     final List<Map<String, dynamic>> maps = await dataBase.read('expenses');
+    List<ExpenseModel> expenses = maps.map((e) => ExpenseModel.fromMap(e)).toList();
 
-    return maps.map((e) => ExpenseModel.fromMap(e)).toList();
+    // Filter expenses by selected month and year
+    expenses = expenses.where((expense) {
+      final expenseDate = DateFormat('d MMM yyyy').parse(expense.date);
+      return expenseDate.month == selectedMonth && expenseDate.year == selectedYear;
+    }).toList();
+
+    return expenses;
   }
+
+  void _onMonthSelected(int monthIndex) {
+    setState(() {
+      selectedMonth = monthIndex + 1;
+    });
+    _refreshExpenses();
+  }
+
+  void _onExpenseDeleted() {
+    _refreshExpenses();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +97,6 @@ class _HomePageState extends State<HomePage> {
               );
             },
           );
-          
         },
         child: Icon(Icons.add, color: Colors.white),
       ),
@@ -89,20 +118,25 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(height: 57),
-              const Center(
-                child: Text("\$0.00", style: TextStyles.totalAmountStyle),
+              Center(
+                child: Text(
+                  '\$${totalAmount.toStringAsFixed(2)}',
+                  style: TextStyles.totalAmountStyle,
+                ),
               ),
               const SizedBox(height: 57),
-              const ExpenseMonthFilter(),
+              ExpenseMonthFilter(onMonthSelected: _onMonthSelected),
               const SizedBox(height: 40),
-              FutureBuilder(
+              FutureBuilder<List<ExpenseModel>>(
                 future: _expensesFuture,
                 builder: (context, snapshot) {
                   if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     final List<ExpenseModel> expenses = snapshot.data!;
-                    return ExpenseDataState(expenses: expenses);
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
+                    return ExpenseDataState(
+                      expenses: expenses,
+                      onExpenseDeleted: _onExpenseDeleted,
+                    );
+                  } else if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else {
                     return const ExpenseEmptyState();
